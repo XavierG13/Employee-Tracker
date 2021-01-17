@@ -39,7 +39,7 @@ function runSearch() {
     .then(function (answer) {
       switch (answer.action) {
         case "View All Employees":
-          //   allEmployees();
+          allEmployees();
           break;
 
         case "View All Employees by Department":
@@ -51,7 +51,7 @@ function runSearch() {
           break;
 
         case "Add Employee":
-          addEmployee();
+          // addEmployee();
           break;
 
         case "Remove Employee":
@@ -59,7 +59,7 @@ function runSearch() {
           break;
 
         case "Update Employee Role":
-          //   updateEmployee();
+          //   updateRole();
           break;
 
         case "Update Employee Manager":
@@ -69,8 +69,19 @@ function runSearch() {
     });
 }
 
+// uncomment when their is a list to view from
+// function allEmployees() {
+//   connection.query(
+//     "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee e on employee.manager_id = e.id;",
+//     function (err, res) {
+//       if (err) throw err;
+//       runSearch();
+//     }
+//   );
+// }
+
 function addEmployee() {
-  inquirer.prompt(
+  inquirer.prompt([
     {
       name: "employee_first_name",
       type: "input",
@@ -83,8 +94,31 @@ function addEmployee() {
     },
     {
       name: "role",
-      type: "list",
+      type: "input",
+      // change to list when updateRole is created
       message: "Please select their role: ",
-    }
-  );
+      // choices: updateRole();
+    },
+    {
+      name: "manager",
+      type: "input",
+      // change to list when updateManager is created
+      message: "Who is their Manager?",
+    },
+  ]);
+  // uncomment when ready to insert info in the database
+  // .then(function (answer) {
+  //   connection.query(
+  //     "INSERT INTO employee SET ?",
+  //     {
+  //       first_name: answer.item,
+  //       last_name: answer.item,
+  //       role: answer.item,
+  //       manager: answer.item,
+  //     },
+  //     function (err) {
+  //       if (err) throw err;
+  //     }
+  //   );
+  // });
 }
