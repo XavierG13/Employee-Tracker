@@ -51,7 +51,7 @@ function runSearch() {
           break;
 
         case "Add Employee":
-          //   addEmployee();
+          addEmployee();
           break;
 
         case "Remove Employee":
@@ -67,4 +67,24 @@ function runSearch() {
           break;
       }
     });
+}
+
+function addEmployee() {
+  inquirer.prompt(
+    {
+      name: "employee_first_name",
+      type: "input",
+      message: "Please enter employee's first name: ",
+    },
+    {
+      name: "employee_last_name",
+      type: "input",
+      message: "Please enter employee's last name: ",
+    },
+    {
+      name: "role",
+      type: "list",
+      message: "Please select their role: ",
+    }
+  );
 }
