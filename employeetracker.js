@@ -56,16 +56,16 @@ function runSearch() {
         //   break;
 
         case "Add Employee":
-          addEmployee();
+          createEmployee();
           break;
 
         case "Add Role":
           createRole();
           break;
 
-        // case "Add Department":
-        //   addDepartment();
-        //   break;
+        case "Add Department":
+          addDepartment();
+          break;
 
         // case "Remove Employee":
         //   //   removeEmployee();
@@ -83,7 +83,7 @@ function runSearch() {
 }
 
 // add employee to db
-function addEmployee() {
+function createEmployee() {
   inquirer.prompt([
     {
       name: "employee_first_name",
@@ -99,7 +99,7 @@ function addEmployee() {
       name: "role",
       type: "list",
       message: "Please select their role: ",
-      choices: createRole(),
+      choices: updateRole(),
     },
     {
       name: "manager",
@@ -129,7 +129,32 @@ function addEmployee() {
   // });
 }
 
-// view all employees
+function addDepartment() {
+  inquirer
+    .prompt([
+      {
+        name: "department_name",
+        type: "input",
+        message: "Please enter Department you would like to add: ",
+      },
+    ])
+    .then(function (res) {
+      var query = "INSERT INTO department SET ?";
+      connection.query(
+        query,
+        {
+          department_name: res.name,
+        },
+        function (err) {
+          if (err) throw err;
+          console.table(res);
+          runSearch();
+        }
+      );
+    });
+}
+
+// view all employees/ employees by department/ employees by role
 function allEmployees() {
   var query =
     "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee e on employee.manager_id = e.id;";
