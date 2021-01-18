@@ -1,10 +1,10 @@
+// Dependencies
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 
 var connection = mysql.createConnection({
   host: "localhost",
 
-  // Your port; if not 3306
   port: 3306,
 
   // Your username
@@ -43,7 +43,11 @@ function runSearch() {
           break;
 
         case "View All Employees by Department":
-          //   employeeDepartment();
+          employeeDepartment();
+          break;
+
+        case "View All Roles":
+          employeeRole();
           break;
 
         case "View All Employees by Manager":
@@ -51,7 +55,7 @@ function runSearch() {
           break;
 
         case "Add Employee":
-          // addEmployee();
+          addEmployee();
           break;
 
         case "Remove Employee":
@@ -69,17 +73,17 @@ function runSearch() {
     });
 }
 
-// uncomment when their is a list to view from
-// function allEmployees() {
-//   connection.query(
-//     "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee e on employee.manager_id = e.id;",
-//     function (err, res) {
-//       if (err) throw err;
-//       runSearch();
-//     }
-//   );
-// }
+// view all employees
+function allEmployees() {
+  var query =
+    "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee e on employee.manager_id = e.id;";
+  connection.query(query, function (err, res) {
+    if (err) throw err;
+    runSearch();
+  });
+}
 
+// add employee to db
 function addEmployee() {
   inquirer.prompt([
     {
@@ -104,6 +108,7 @@ function addEmployee() {
       type: "input",
       // change to list when updateManager is created
       message: "Who is their Manager?",
+      // choices: updateManager();
     },
   ]);
   // uncomment when ready to insert info in the database
@@ -122,3 +127,27 @@ function addEmployee() {
   //   );
   // });
 }
+
+// views all employees by department
+function employeeDepartment() {
+  var query =
+    "SELECT employee.first_name, employee.last_name, department.employee_name AS Department FROM employee JOIN role ON employee.id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id;";
+  connect.query(query, function (err, res) {
+    if (err) throw err;
+    console.table(res);
+  });
+}
+
+//view all employees by role
+function employeeRole() {
+  var query =
+    "SELECT employee.first_name, employee.last_name, role.title AS Title FROM employee JOIN role ON employee.role_id = role.id;";
+  connection.query(query, function (err, res) {
+    if (err) throw err;
+    console.table(res);
+  });
+}
+
+// function employeeManager() {
+//   var query = "SELECT employee.first_name, employee.last_name, department.name AS Manager FROM employee JOIN role ON employee.manager_id = role.id JOIN . ";
+// }
