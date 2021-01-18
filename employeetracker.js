@@ -25,7 +25,7 @@ function runSearch() {
   inquirer
     .prompt({
       name: "action",
-      type: "rawlist",
+      type: "list",
       message: "What would you like to do?",
       choices: [
         "View All Employees",
@@ -103,16 +103,17 @@ function addEmployee() {
     },
     {
       name: "manager",
-      type: "input",
-      // change to list when updateManager is created
+      type: "list",
       message: "Who is their Manager?",
-      // choices: createManager(),
+      choices: createManager(),
     },
   ]);
-  // uncomment when ready to insert info in the database
   // .then(function (answer) {
+  //   var query = "INSERT INTO employee SET ?";
+  //   var roleId = createRole().indexOf(answer.role) + 1;
+  //   var managersId = createManager().indexOf(answer.role) + 1
   //   connection.query(
-  //     "INSERT INTO employee SET ?",
+  //     query,
   //     {
   //       first_name: answer.item,
   //       last_name: answer.item,
@@ -121,8 +122,8 @@ function addEmployee() {
   //     },
   //     function (err) {
   //       if (err) throw err;
-  // console.table(res);
-  //runSearch();
+  //       console.table(res);
+  //       runSearch();
   //     }
   //   );
   // });
@@ -162,9 +163,19 @@ function allEmployees() {
 //   });
 // }
 
-// function employeeManager() {
-//   var query = "SELECT employee.first_name, employee.last_name, department.name AS Manager FROM employee JOIN role ON employee.manager_id = role.id JOIN . ";
-// }
+// function for selecting a manager when prompted who is their manager
+var managersArray = [];
+function createManager() {
+  var query =
+    "SELECT first_name, last_name FROM employee WHERE manager_id IS NULL";
+  connection.query(query, function (err, res) {
+    if (err) throw err;
+    for (var i = 0; i < res.length; i++) {
+      managersArray.push(res[i].first_name);
+    }
+  });
+  return managersArray;
+}
 
 // functions for selecting a role and adding a role
 var rolesArray = [];
