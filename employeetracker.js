@@ -32,6 +32,8 @@ function runSearch() {
         "View All Employees by Department",
         "View All Employees by Manager",
         "Add Employee",
+        "Add Role",
+        "Add Department",
         "Remove Employee",
         "Update Employee Role",
         "Update Employee Manager",
@@ -133,7 +135,7 @@ function addDepartment() {
   inquirer
     .prompt([
       {
-        name: "department_name",
+        name: "name",
         type: "input",
         message: "Please enter Department you would like to add: ",
       },
@@ -143,7 +145,7 @@ function addDepartment() {
       connection.query(
         query,
         {
-          department_name: res.name,
+          name: res.name,
         },
         function (err) {
           if (err) throw err;
