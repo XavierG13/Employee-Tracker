@@ -1,6 +1,7 @@
 // Dependencies
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+const { allowedNodeEnvironmentFlags } = require("process");
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -42,45 +43,43 @@ function runSearch() {
           allEmployees();
           break;
 
-        case "View All Employees by Department":
-          employeeDepartment();
-          break;
+        // case "View All Employees by Department":
+        //   employeeDepartment();
+        //   break;
 
-        case "View All Roles":
-          employeeRole();
-          break;
+        // case "View All Roles":
+        //   employeeRole();
+        //   break;
 
-        case "View All Employees by Manager":
-          //   employeeManager();
-          break;
+        // case "View All Employees by Manager":
+        //   //   employeeManager();
+        //   break;
 
         case "Add Employee":
           addEmployee();
           break;
 
-        case "Remove Employee":
-          //   removeEmployee();
+        case "Add Role":
+          createRole();
           break;
+
+        // case "Add Department":
+        //   addDepartment();
+        //   break;
+
+        // case "Remove Employee":
+        //   //   removeEmployee();
+        //   break;
 
         case "Update Employee Role":
-          //   updateRole();
+          updateRole();
           break;
 
-        case "Update Employee Manager":
-          //   updateManager();
-          break;
+        // case "Update Employee Manager":
+        //   //   updateManager();
+        //   break;
       }
     });
-}
-
-// view all employees
-function allEmployees() {
-  var query =
-    "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee e on employee.manager_id = e.id;";
-  connection.query(query, function (err, res) {
-    if (err) throw err;
-    runSearch();
-  });
 }
 
 // add employee to db
@@ -98,17 +97,16 @@ function addEmployee() {
     },
     {
       name: "role",
-      type: "input",
-      // change to list when updateRole is created
+      type: "list",
       message: "Please select their role: ",
-      // choices: updateRole();
+      choices: createRole(),
     },
     {
       name: "manager",
       type: "input",
       // change to list when updateManager is created
       message: "Who is their Manager?",
-      // choices: updateManager();
+      // choices: createManager(),
     },
   ]);
   // uncomment when ready to insert info in the database
@@ -119,35 +117,98 @@ function addEmployee() {
   //       first_name: answer.item,
   //       last_name: answer.item,
   //       role: answer.item,
-  //       manager: answer.item,
+  //       role_id: answer.item,
   //     },
   //     function (err) {
   //       if (err) throw err;
+  // console.table(res);
+  //runSearch();
   //     }
   //   );
   // });
 }
 
-// views all employees by department
-function employeeDepartment() {
+// view all employees
+function allEmployees() {
   var query =
-    "SELECT employee.first_name, employee.last_name, department.employee_name AS Department FROM employee JOIN role ON employee.id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id;";
-  connect.query(query, function (err, res) {
-    if (err) throw err;
-    console.table(res);
-  });
-}
-
-//view all employees by role
-function employeeRole() {
-  var query =
-    "SELECT employee.first_name, employee.last_name, role.title AS Title FROM employee JOIN role ON employee.role_id = role.id;";
+    "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee e on employee.manager_id = e.id;";
   connection.query(query, function (err, res) {
     if (err) throw err;
     console.table(res);
+    runSearch();
   });
 }
+
+// **UNCOMMENT functions employeeDepartment and employeeRole when functions to create role and
+// // views all employees by department
+// function employeeDepartment() {
+//   var query =
+//     "SELECT employee.first_name, employee.last_name, department.name AS Department FROM employee JOIN role ON employee.id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id;";
+//   connect.query(query, function (err, res) {
+//     if (err) throw err;
+//     console.table(res);
+// runSearch();
+//   });
+// }
+
+// //view all employees by role
+// function employeeRole() {
+//   var query =
+//     "SELECT employee.first_name, employee.last_name, role.title AS Title FROM employee JOIN role ON employee.role_id = role.id;";
+//   connection.query(query, function (err, res) {
+//     if (err) throw err;
+//     console.table(res);
+//     runSearch();
+//   });
+// }
 
 // function employeeManager() {
 //   var query = "SELECT employee.first_name, employee.last_name, department.name AS Manager FROM employee JOIN role ON employee.manager_id = role.id JOIN . ";
 // }
+
+// functions for selecting a role and adding a role
+var rolesArray = [];
+function updateRole() {
+  var query = "SELECT * FROM role";
+  connection.query(query, function (err, res) {
+    if (err) throw err;
+    for (var i = 0; i < res.length; i++) {
+      rolesArray.push(res[i].title);
+    }
+  });
+  return rolesArray;
+}
+
+function createRole() {
+  var query = "SELECT role.title AS Title, role.salary AS Salary FROM role;";
+  connection.query(query, function (req, res) {
+    inquirer
+      .prompt([
+        {
+          name: "Title",
+          type: "input",
+          message: "Please input the Title of the role: ",
+        },
+        {
+          name: "Salary",
+          type: "input",
+          message: "Please input the Salary of the role: ",
+        },
+      ])
+      .then(function (res) {
+        var query = "INSERT INTO role SET ?";
+        connection.query(
+          query,
+          {
+            title: res.Title,
+            salary: res.Salary,
+          },
+          function (err) {
+            if (err) throw err;
+            console.table(res);
+            runSearch();
+          }
+        );
+      });
+  });
+}
