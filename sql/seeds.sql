@@ -37,6 +37,13 @@ SELECT employee.first_name,
     role.title AS Manager
 FROM employee
     JOIN role ON employee.manager_id = role.id;
+-- ======= Utilized Budget ======= --
+SELECT department_id AS id,
+    department.name AS department,
+    SUM(salary) AS budget
+FROM role
+    INNER JOIN department ON role.department_id = department.id
+GROUP BY role.department_id;
 -- ======= Department Seeds ======= --
 INSERT INTO department (name) VALUE ("Sales");
 INSERT INTO department (name) VALUE ("Engineering");

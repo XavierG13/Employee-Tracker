@@ -31,6 +31,7 @@ function runSearch() {
         "View All Employees by Department",
         "View All Employees by Manager",
         "View All Employees by Roles",
+        "View Total Utilized Budgets for Departments",
         "Add Employee",
         "Add Role",
         "Add Department",
@@ -57,6 +58,10 @@ function runSearch() {
 
         case "View All Employees by Manager":
           employeeManager();
+          break;
+
+        case "View Total Utilized Budgets for Departments":
+          viewUtilizedBudget();
           break;
 
         case "Add Employee":
@@ -262,7 +267,7 @@ function updateEmployeeRole() {
           name: "role",
           type: "list",
           message: "Please select a new role: ",
-          choices: updateRole()
+          choices: updateRole(),
         },
       ])
       .then(function (val) {
@@ -283,7 +288,7 @@ function updateEmployeeRole() {
           function (err) {
             if (err) throw err;
             console.table(val);
-            runSearch;
+            runSearch();
           }
         );
       });
@@ -400,10 +405,20 @@ function createRole() {
   });
 }
 
+function viewUtilizedBudget() {
+  var query =
+    "SELECT department_id AS id, department.name AS Department, SUM(salary) as Budget FROM role INNER JOIN Department on role.department_id = department.id GROUP BY role.department_id";
+  connection.query(query, function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    runSearch();
+  });
+}
+
 // function will delete employee user selected
-// function deleteEmployee() {
-//   var query = "DELETE "
-// }
+function deleteEmployee() {
+  var query = "DELETE ";
+}
 
 // // function will delete department user selected
 // function deleteDepartment() {}
