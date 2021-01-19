@@ -176,7 +176,7 @@ function createDepartment() {
 // view all employees/ employees by department/ employees by role
 function allEmployees() {
   var query =
-    "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(emp.first_name, ' ' ,emp.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee emp on employee.manager_id = emp.id";
+    "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(emp.first_name, ' ' ,emp.last_name) AS Manager FROM employee INNER JOIN role ON role.id = employee.role_id INNER JOIN department ON department.id = role.department_id LEFT JOIN employee emp ON employee.manager_id = emp.id";
   connection.query(query, function (err, res) {
     if (err) throw err;
     console.table(res);
@@ -225,7 +225,7 @@ function createManager() {
   connection.query(query, function (err, res) {
     if (err) throw err;
     for (var i = 0; i < res.length; i++) {
-      managersArray.push(res[i].first_name, res[i].last_name);
+      managersArray.push(res[i].first_name + " " + res[i].last_name);
     }
   });
   return managersArray;
@@ -407,7 +407,7 @@ function createRole() {
 
 function viewUtilizedBudget() {
   var query =
-    "SELECT department_id AS id, department.name AS Department, SUM(salary) as Budget FROM role INNER JOIN Department on role.department_id = department.id GROUP BY role.department_id";
+    "SELECT department_id AS id, department.name AS Department, SUM(salary) as Budget FROM role INNER JOIN Department ON role.department_id = department.id GROUP BY role.department_id";
   connection.query(query, function (err, res) {
     if (err) throw err;
     console.table(res);
@@ -416,9 +416,9 @@ function viewUtilizedBudget() {
 }
 
 // function will delete employee user selected
-function deleteEmployee() {
-  var query = "DELETE ";
-}
+// function deleteEmployee() {
+//   var query = "DELETE ";
+// }
 
 // // function will delete department user selected
 // function deleteDepartment() {}
