@@ -1,7 +1,6 @@
 // Dependencies
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-const { allowedNodeEnvironmentFlags } = require("process");
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -35,6 +34,8 @@ function runSearch() {
         "Add Role",
         "Add Department",
         "Remove Employee",
+        "Remove Role",
+        "Remove Department",
         "Update Employee Role",
         "Update Employee Manager",
       ],
@@ -66,20 +67,28 @@ function runSearch() {
           break;
 
         case "Add Department":
-          addDepartment();
+          createDepartment();
           break;
 
         // case "Remove Employee":
-        //   //   removeEmployee();
+        //   //   deleteEmployee();
+        //   break;
+
+        //case "Remove Role":
+        // // deleteRole();
+        // break;
+
+        // case "Remove Department":
+        //   deleteDepartment();
         //   break;
 
         case "Update Employee Role":
           updateRole();
           break;
 
-        // case "Update Employee Manager":
-        //   //   updateManager();
-        //   break;
+        case "Update Employee Manager":
+          updateManager();
+          break;
       }
     });
 }
@@ -132,7 +141,8 @@ function createEmployee() {
     });
 }
 
-function addDepartment() {
+// function to create a new department for employees
+function createDepartment() {
   inquirer
     .prompt([
       {
@@ -215,6 +225,70 @@ function createManager() {
   return managersArray;
 }
 
+// function will update the employee managers
+function updateManager() {
+  var query =
+    "SELECT employee.first_name, employee.last_name, role.title FROM employee JOIN role ON employee.manager_id = role.id;";
+  connection.query(query, function (err, res) {
+    if (err) throw err;
+    // return console.log(res);
+    inquirer
+      .prompt([
+        {
+          name: "firstName",
+          type: "list",
+          choices: function () {
+            var firstName = [];
+            for (var i = 0; i < res.length; i++) {
+              firstName.push(res[i].first_name);
+            }
+            return firstName;
+          },
+          message: "What is the employee's first name?",
+        },
+        {
+          name: "lastName",
+          type: "list",
+          choices: function () {
+            var lastName = [];
+            for (var i = 0; i < res.length; i++) {
+              lastName.push(res[i].last_name);
+            }
+            return lastName;
+          },
+          message: "What is the employee's last name?",
+        },
+        {
+          name: "manager",
+          type: "list",
+          message: "Who is the new Manager?",
+          choices: createManager(),
+        },
+      ])
+      .then(function (value) {
+        var managersId = createManager().indexOf(value.manager) + 1;
+        var query = "UPDATE employee SET WHERE ?;";
+        connection.query(
+          query,
+          {
+            first_name: value.firstName,
+          },
+          {
+            last_name: value.lastName,
+          },
+          {
+            manager_id: managersId,
+          },
+          function (err) {
+            if (err) throw err;
+            console.table(value);
+            runSearch();
+          }
+        );
+      });
+  });
+}
+
 // functions for selecting a role and adding a role
 var rolesArray = [];
 function updateRole() {
@@ -227,7 +301,7 @@ function updateRole() {
   });
   return rolesArray;
 }
-
+// function will create a new role for employee placement
 function createRole() {
   var query = "SELECT role.title AS Title, role.salary AS Salary FROM role;";
   connection.query(query, function (req, res) {
