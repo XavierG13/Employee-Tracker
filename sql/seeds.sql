@@ -1,4 +1,4 @@
--- will be used when view all employees is selected
+-- === will be used when view all employees is selected === --
 SELECT employee.first_name,
     employee.last_name,
     role.title,
