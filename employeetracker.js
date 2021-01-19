@@ -84,7 +84,7 @@ function runSearch() {
         //   break;
 
         case "Update Employee Role":
-          updateRole();
+          updateEmployeeRole();
           break;
 
         // case "Update Employee Manager":
@@ -171,7 +171,7 @@ function createDepartment() {
 // view all employees/ employees by department/ employees by role
 function allEmployees() {
   var query =
-    "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(emp.first_name, ' ' ,emp.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee emp on employee.manager_id = emp.id;";
+    "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(emp.first_name, ' ' ,emp.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee emp on employee.manager_id = emp.id";
   connection.query(query, function (err, res) {
     if (err) throw err;
     console.table(res);
@@ -182,7 +182,7 @@ function allEmployees() {
 // views all employees by department
 function employeeDepartment() {
   var query =
-    "SELECT employee.first_name, employee.last_name, department.name AS Department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id;";
+    "SELECT employee.first_name, employee.last_name, department.name AS Department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id";
   connection.query(query, function (err, res) {
     if (err) throw err;
     console.table(res);
@@ -193,7 +193,7 @@ function employeeDepartment() {
 //view all employees by role
 function employeeRole() {
   var query =
-    "SELECT employee.first_name, employee.last_name, role.title AS Title FROM employee JOIN role ON employee.role_id = role.id;";
+    "SELECT employee.first_name, employee.last_name, role.title AS Title FROM employee JOIN role ON employee.role_id = role.id";
   connection.query(query, function (err, res) {
     if (err) throw err;
     console.table(res);
@@ -204,7 +204,7 @@ function employeeRole() {
 // view all employee manager
 function employeeManager() {
   var query =
-    "SELECT employee.first_name, employee.last_name, role.title AS Manager FROM employee JOIN role ON employee.manager_id = role.id;";
+    "SELECT employee.first_name, employee.last_name, role.title AS Manager FROM employee JOIN role ON employee.manager_id = role.id";
   connection.query(query, function (err, res) {
     if (err) throw err;
     console.table(res);
@@ -220,23 +220,86 @@ function createManager() {
   connection.query(query, function (err, res) {
     if (err) throw err;
     for (var i = 0; i < res.length; i++) {
-      managersArray.push(res[i].first_name);
+      managersArray.push(res[i].first_name, res[i].last_name);
     }
   });
   return managersArray;
 }
 
+// function will update the employees role
+function updateEmployeeRole() {
+  var query =
+    "SELECT employee.first_name, employee.last_name, role.title FROM employee JOIN role ON employee.role_id = role.id";
+  connection.query(query, function (err, res) {
+    if (err) throw err;
+    inquirer
+      .prompt([
+        {
+          name: "employee_first_name",
+          type: "list",
+          choices: function () {
+            var firstName = [];
+            for (var i = 0; i < res.length; i++) {
+              firstName.push(res[i].first_name);
+            }
+            return firstName;
+          },
+          message: "Employee First Name: ",
+        },
+        {
+          name: "employee_last_name",
+          type: "list",
+          choices: function () {
+            var lastName = [];
+            for (var i = 0; i < res.length; i++) {
+              lastName.push(res[i].last_name);
+            }
+            return lastName;
+          },
+          message: "Employee Last Name: ",
+        },
+        {
+          name: "role",
+          type: "list",
+          message: "Please select a new role: ",
+          choices: updateRole()
+        },
+      ])
+      .then(function (val) {
+        if (err) throw err;
+        var newRoleId = updateRole().indexOf(val.role) + 1;
+        var query = "UPDATE employee SET WHERE ?";
+        connection.query(
+          query,
+          {
+            first_name: val.employee_first_name,
+          },
+          {
+            last_name: val.employee_last_name,
+          },
+          {
+            role_id: newRoleId,
+          },
+          function (err) {
+            if (err) throw err;
+            console.table(val);
+            runSearch;
+          }
+        );
+      });
+  });
+}
 // function will update the employee managers
 // function updateManager() {
 //   var query =
-//     "SELECT employee.first_name, employee.last_name, role.title FROM employee JOIN role ON employee.manager_id = role.id;";
+//     "";
 //   connection.query(query, function (err, res) {
 //     if (err) throw err;
 //     // return console.log(res);
 //     inquirer
 //       .prompt([
 //         {
-//           name: "firstName",
+//           name: "employee_first_name",
 //           type: "list",
 //           choices: function () {
 //             var firstName = [];
@@ -248,7 +311,7 @@ function createManager() {
 //           message: "What is the employee's first name?",
 //         },
 //         {
-//           name: "lastName",
+//           name: "employee_last_name",
 //           type: "list",
 //           choices: function () {
 //             var lastName = [];
@@ -272,10 +335,10 @@ function createManager() {
 //         connection.query(
 //           query,
 //           {
-//             first_name: value.firstName,
+//             first_name: value.employee_first_name,
 //           },
 //           {
-//             last_name: value.lastName,
+//             last_name: value.employee_last_name,
 //           },
 //           {
 //             manager_id: managersId,
@@ -335,15 +398,15 @@ function createRole() {
         );
       });
   });
-
-  // function will delete employee user selected
-  // function deleteEmployee() {
-  //   var query = "DELETE "
-  // }
-
-  // // function will delete department user selected
-  // function deleteDepartment() {}
-
-  // // function will delete role user selected
-  // function deleteRole() {}
 }
+
+// function will delete employee user selected
+// function deleteEmployee() {
+//   var query = "DELETE "
+// }
+
+// // function will delete department user selected
+// function deleteDepartment() {}
+
+// // function will delete role user selected
+// function deleteRole() {}
