@@ -190,6 +190,17 @@ function allEmployees() {
 //   });
 // }
 
+// view all employee manager
+function employeeManager() {
+  var query =
+    "SELECT employee.first_name, employee.last_name, role.title AS Manager FROM employee JOIN role ON employee.manager_id = role.id;";
+  connection.query(query, function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    runSearch();
+  });
+}
+
 // function for selecting a manager when prompted who is their manager
 var managersArray = [];
 function createManager() {
