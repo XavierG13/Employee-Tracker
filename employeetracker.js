@@ -334,4 +334,13 @@ function createRole() {
         );
       });
   });
+
+  // // function will delete employee user selected
+  // function deleteEmployee() {}
+
+  // // function will delete department user selected
+  // function deleteDepartment() {}
+
+  // // function will delete role user selected
+  // function deleteRole() {}
 }
