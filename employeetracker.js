@@ -30,6 +30,7 @@ function runSearch() {
         "View All Employees",
         "View All Employees by Department",
         "View All Employees by Manager",
+        "View All Employees by Roles",
         "Add Employee",
         "Add Role",
         "Add Department",
@@ -50,7 +51,7 @@ function runSearch() {
           employeeDepartment();
           break;
 
-        case "View All Roles":
+        case "View All Employees by Roles":
           employeeRole();
           break;
 
@@ -170,7 +171,7 @@ function createDepartment() {
 // view all employees/ employees by department/ employees by role
 function allEmployees() {
   var query =
-    "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee e on employee.manager_id = e.id;";
+    "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(emp.first_name, ' ' ,emp.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee emp on employee.manager_id = emp.id;";
   connection.query(query, function (err, res) {
     if (err) throw err;
     console.table(res);
@@ -181,10 +182,11 @@ function allEmployees() {
 // views all employees by department
 function employeeDepartment() {
   var query =
-    "SELECT employee.first_name, employee.last_name, department.name AS Department FROM employee JOIN role ON employee.id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id;";
-  connect.query(query, function (err, res) {
+    "SELECT employee.first_name, employee.last_name, department.name AS Department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id;";
+  connection.query(query, function (err, res) {
     if (err) throw err;
-    console.table(res);
+    return console.log(res);
+    // console.table(res);
     runSearch();
   });
 }
@@ -267,7 +269,7 @@ function updateManager() {
       ])
       .then(function (value) {
         var managersId = createManager().indexOf(value.manager) + 1;
-        var query = "UPDATE employee SET WHERE ?;";
+        var query = "UPDATE manager SET WHERE ?;";
         connection.query(
           query,
           {
