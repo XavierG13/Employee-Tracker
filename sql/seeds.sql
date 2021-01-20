@@ -39,8 +39,8 @@ FROM employee
     JOIN role ON employee.manager_id = role.id;
 -- ======= Utilized Budget ======= --
 SELECT department_id AS id,
-    department.name AS department,
-    SUM(salary) AS budget
+    department.name AS Department,
+    SUM(salary) AS Budget
 FROM role
     INNER JOIN department ON role.department_id = department.id
 GROUP BY role.department_id;

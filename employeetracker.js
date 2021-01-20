@@ -117,7 +117,7 @@ function createEmployee() {
         name: "role",
         type: "list",
         message: "Please select their role: ",
-        choices: updateRole(),
+        choices: getRoles(),
       },
       {
         name: "manager",
@@ -128,7 +128,7 @@ function createEmployee() {
     ])
     .then(function (value) {
       var query = "INSERT INTO employee SET ?";
-      var roleId = updateRole().indexOf(value.role) + 1;
+      var roleId = getRoles().indexOf(value.role) + 1;
       var managersId = createManager().indexOf(value.manager) + 1;
       connection.query(
         query,
@@ -267,24 +267,24 @@ function updateEmployeeRole() {
           name: "role",
           type: "list",
           message: "Please select a new role: ",
-          choices: updateRole(),
+          choices: getRoles(),
         },
       ])
       .then(function (val) {
+        console.log(val);
         if (err) throw err;
-        var newRoleId = updateRole().indexOf(val.role) + 1;
-        var query = "UPDATE employee SET WHERE ?";
+        var newRoleId = getRoles().indexOf(val.role) + 1;
+        console.log(newRoleId);
+        var query =
+          "UPDATE employee SET first_name = ?, last_name = ?, role_id = ? WHERE last_name = ?";
         connection.query(
           query,
-          {
-            first_name: val.employee_first_name,
-          },
-          {
-            last_name: val.employee_last_name,
-          },
-          {
-            role_id: newRoleId,
-          },
+          [
+            val.employee_first_name,
+            val.employee_last_name,
+            newRoleId,
+            val.employee_last_name,
+          ],
           function (err) {
             if (err) throw err;
             console.table(val);
@@ -360,7 +360,7 @@ function updateEmployeeRole() {
 
 // functions for selecting a role and adding a role
 var rolesArray = [];
-function updateRole() {
+function getRoles() {
   var query = "SELECT * FROM role";
   connection.query(query, function (err, res) {
     if (err) throw err;
